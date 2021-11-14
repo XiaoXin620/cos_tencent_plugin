@@ -4,17 +4,23 @@ import QCloudCOSXML
 
 public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvider {
     var arguments:[String:Any]!;
-    
+    var  channel:FlutterMethodChannel!;
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "cos_tencent_plugin", binaryMessenger: registrar.messenger())
-        let instance = SwiftCosTencentPlugin()
+        //        let instance = SwiftCosTencentPlugin()
+        let instance = SwiftCosTencentPlugin().initWithChannel(channel: channel)
         registrar.addMethodCallDelegate(instance, channel: channel)
+    }
+    
+    public func initWithChannel(channel:FlutterMethodChannel) -> SwiftCosTencentPlugin{
+        self.channel = channel;
+        return self;
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         
         self.arguments = call.arguments as? [String:Any]
-//        self.arguments = call.arguments;
+        //        self.arguments = call.arguments;
         print(self.arguments as Any)
         switch(call.method){
             
@@ -76,17 +82,35 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
                 //      totalBytesExpectedToSend  本次上传要发送的总字节数（即一个文件大小）
                 
                 //空字典创建
-                var data = [String: String]()
+                var data = [AnyHashable: Any]()
                 data.updateValue(urlStr!, forKey: "localPath")
                 data.updateValue(cosPath!, forKey: "cosPath")
                 
+                let a = NSNumber(value: totalBytesSent)
+                let b = NSNumber(value: totalBytesExpectedToSend)
+                let c = NSNumber(value: a.doubleValue / b.doubleValue * 100)
+                
+                data.updateValue(c, forKey: "progress")
+                
+                self.channel.invokeMethod("progress", arguments: data)
                 //                        int c = totalBytesSent/totalBytesExpectedToSend*100;
                 //
                 //                        data.updateValue(c, forKey: "progress")
                 
             };
             
-            
+            put.setFinish { (result, error)in
+                //空字典创建
+                var data = [AnyHashable: Any]()
+                data.updateValue(urlStr!, forKey: "localPath")
+                data.updateValue(cosPath!, forKey: "cosPath")
+                if error != nil{
+                    data.updateValue(error!, forKey: "message")
+                    self.channel.invokeMethod("onFailed", arguments: data)
+                }else{
+                    self.channel.invokeMethod("onSuccess", arguments: data)
+                }
+            }
             
             
             break;
