@@ -124,9 +124,13 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
     
     public func signature(with fileds: QCloudSignatureFields!, request: QCloudBizHTTPRequest!, urlRequest urlRequst: NSMutableURLRequest!, compelete continueBlock: QCloudHTTPAuthentationContinueBlock!) {
         let credential = QCloudCredential.init();
-//        credential.secretID = (self.arguments["secretId"] as! String);
-//        credential.secretKey = (self.arguments["secretKey"] as! String);
-//        credential.token = (self.arguments["sessionToken"] as! String);
+        credential.secretID = (self.arguments["secretId"] as! String);
+        credential.secretKey = (self.arguments["secretKey"] as! String);
+        credential.token = (self.arguments["sessionToken"] as! String);
+        
+        credential.startDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["startTime"] as! NSNumber)));
+        credential.expirationDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["expiredTime"] as! NSNumber)))
+        
         // 使用永久密钥计算签名
         let auth = QCloudAuthentationV5Creator.init(credential: credential);
         let signature = auth?.signature(forData: urlRequst)

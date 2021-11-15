@@ -29,7 +29,8 @@ class CosTencentPlugin {
       String secretId,
       String secretKey,
       String sessionToken,
-      expiredTime,
+      int startTime,
+      int expiredTime,
       String cosPath,
       String localPath) {
     return _channel.invokeMethod<dynamic>('uploadFile', {
@@ -38,6 +39,7 @@ class CosTencentPlugin {
       'bucket': bucket,
       'secretId': secretId,
       'secretKey': secretKey,
+      'startTime': startTime,
       'expiredTime': expiredTime,
       'sessionToken': sessionToken,
       'cosPath': cosPath,

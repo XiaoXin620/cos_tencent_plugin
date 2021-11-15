@@ -79,16 +79,7 @@ class _ImageState extends State<Image> {
         if (assets != null) {
           AssetEntity asset = assets.first;
           File? file = await asset.originFile;
-          CosTencentPlugin.uploadByFile(
-              "ap-guangzhou",
-              "1300991923",
-              "xyiot-1300991923",
-              "secretId",
-              "secretKey",
-              "sessionToken",
-              "expiredTime",
-              "saas-files/50438161-2734-4eae-89ab-d11d39bb0096",
-              file!.path);
+
         }
       }, child: Text("选择文件上传"),),
     );
