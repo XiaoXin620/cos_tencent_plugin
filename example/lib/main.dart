@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:cos_tencent_plugin/cos_tencent_plugin.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 void main() {
   runApp(const MyApp());
@@ -54,7 +57,16 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: ElevatedButton(onPressed: () async {
+            final List<AssetEntity>? assets =
+                await AssetPicker.pickAssets(context, maxAssets: 1);
+            if (assets != null) {
+              AssetEntity asset = assets.first;
+              File? file = await asset.originFile;
+              // CosTencentPlugin.uploadByFile(region, appid, bucket, secretId, secretKey, sessionToken, expiredTime, cosPath, localPath)
+            }
+
+          }, child: Text("选择文件上传"),),
         ),
       ),
     );

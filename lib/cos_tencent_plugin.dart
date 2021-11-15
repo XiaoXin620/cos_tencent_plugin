@@ -8,14 +8,44 @@ class CosTencentPlugin {
 
   static Future<String?> get platformVersion async {
     final String? version = await _channel.invokeMethod('getPlatformVersion');
-    final String? version1 =await _channel.invokeMethod("uploadFile",<String,dynamic>{
-      "localPath": "sss",
-      "appid": "add",
-      "region": "regionsss",
-      "region": "regionsssss",
-      "cosPath": "cosPath",
-      "bucket":"bucket1122"
+    // final String? version1 =await _channel.invokeMethod("uploadFile",<String,dynamic>{
+    //   "localPath": "sss",
+    //   "appid": "add",
+    //   "region": "regionsss",
+    //   "region": "regionsssss",
+    //   "cosPath": "cosPath",
+    //   "bucket":"bucket1122"
+    // });
+    return version;
+  }
+
+  static Future<String> get getNative async {
+    return await _channel.invokeMethod('getNative');
+  }
+  static Future<dynamic> uploadByFile(
+      String region,
+      String appid,
+      String bucket,
+      String secretId,
+      String secretKey,
+      String sessionToken,
+      expiredTime,
+      String cosPath,
+      String localPath) {
+    return _channel.invokeMethod<dynamic>('uploadFile', {
+      'region': region,
+      'appid': appid,
+      'bucket': bucket,
+      'secretId': secretId,
+      'secretKey': secretKey,
+      'expiredTime': expiredTime,
+      'sessionToken': sessionToken,
+      'cosPath': cosPath,
+      'localPath': localPath,
     });
-    return version1;
+  }
+
+  static void setMethodCallHandler(Future<dynamic> handler(MethodCall call)) {
+    _channel.setMethodCallHandler(handler);
   }
 }
