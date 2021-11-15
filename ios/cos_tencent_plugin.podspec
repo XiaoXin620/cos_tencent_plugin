@@ -15,6 +15,7 @@ A new Flutter project.
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
+  s.static_framework = true
   #s.dependency 'QCloudCOSXML/Transfer'
   s.platform = :ios, '8.0'
 
