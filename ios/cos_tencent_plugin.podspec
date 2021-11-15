@@ -16,7 +16,7 @@ A new Flutter project.
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
   s.static_framework = true
-  #s.dependency 'QCloudCOSXML/Transfer'
+  s.dependency 'QCloudCOSXML/Transfer'
   s.platform = :ios, '8.0'
 
   # Flutter.framework does not contain a i386 slice.
