@@ -8,6 +8,7 @@ import com.tencent.cos.xml.CosXmlService
 import com.tencent.cos.xml.CosXmlServiceConfig
 import com.tencent.cos.xml.exception.CosXmlClientException
 import com.tencent.cos.xml.exception.CosXmlServiceException
+import com.tencent.cos.xml.ktx.cosService
 import com.tencent.cos.xml.listener.CosXmlProgressListener
 import com.tencent.cos.xml.listener.CosXmlResultListener
 import com.tencent.cos.xml.model.CosXmlRequest
@@ -24,6 +25,11 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import java.util.HashMap
+import com.tencent.qcloud.core.auth.ShortTimeCredentialProvider
+
+import com.tencent.qcloud.core.auth.QCloudCredentialProvider
+import com.tencent.qcloud.core.auth.SessionQCloudCredentials
+
 
 /** CosTencentPlugin */
 class CosTencentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
@@ -47,6 +53,8 @@ class CosTencentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         } else if (call.method == "getNative") {
             result.success("getNative")
         } else if (call.method == "uploadFile") {
+
+
             Log.d("onMethodCall", "uploadFile")
 
 //            val secretId = call.argument<String>("secretId") //secretId
@@ -58,9 +66,13 @@ class CosTencentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             // QCloudCredentialProvider myCredentialProvider =
             //        new ShortTimeCredentialProvider(secretId, secretKey, 300);
 
-            // 此秘钥计算方法与项目中用到的不符合，所以不使用该方法生成秘钥
-            // QCloudCredentialProvider myCredentialProvider =
-            //        new ShortTimeCredentialProvider(secretId, secretKey, 300);
+//            val secretId = "secretId" //永久密钥 secretId
+//
+//            val secretKey = "secretKey" //永久密钥 secretKey
+//
+//            // keyDuration 为请求中的密钥有效期，单位为秒
+//            val myCredentialProvider: QCloudCredentialProvider = ShortTimeCredentialProvider(secretId, secretKey, 300)
+
             val myCredentialProvider = call.argument<String>("secretId")?.let {
                 LocalSessionCredentialProvider(
                         it,
@@ -109,7 +121,7 @@ class CosTencentPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 Log.d("onProgress", "$complete : $target")
                 mActivity.runOnUiThread {
                     val progress = HashMap<String, Any>()
-                    progress["cosPath"] = cosPath
+                    progress["cosPath"] = cosPath!!
                     progress["localPath"] = localPath
                     progress["progress"] = complete * 100.0 / target
                     channel.invokeMethod("onProgress", progress)

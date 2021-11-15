@@ -46,6 +46,7 @@ android {
         applicationId "com.example.cos_tencent_plugin_example"
         minSdkVersion 16
         targetSdkVersion 30
+        multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
