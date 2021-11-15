@@ -56,19 +56,42 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: ElevatedButton(onPressed: () async {
-            final List<AssetEntity>? assets =
-                await AssetPicker.pickAssets(context, maxAssets: 1);
-            if (assets != null) {
-              AssetEntity asset = assets.first;
-              File? file = await asset.originFile;
-              // CosTencentPlugin.uploadByFile(region, appid, bucket, secretId, secretKey, sessionToken, expiredTime, cosPath, localPath)
-            }
-
-          }, child: Text("选择文件上传"),),
-        ),
+        body: Image(),
       ),
     );
   }
 }
+
+class Image extends StatefulWidget {
+  const Image({Key? key}) : super(key: key);
+
+  @override
+  _ImageState createState() => _ImageState();
+}
+
+class _ImageState extends State<Image> {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: ElevatedButton(onPressed: () async {
+        final List<AssetEntity>? assets =
+        await AssetPicker.pickAssets(context, maxAssets: 1);
+        if (assets != null) {
+          AssetEntity asset = assets.first;
+          File? file = await asset.originFile;
+          CosTencentPlugin.uploadByFile(
+              "ap-guangzhou",
+              "1300991923",
+              "xyiot-1300991923",
+              "secretId",
+              "secretKey",
+              "sessionToken",
+              "expiredTime",
+              "saas-files/50438161-2734-4eae-89ab-d11d39bb0096",
+              file!.path);
+        }
+      }, child: Text("选择文件上传"),),
+    );
+  }
+}
+

@@ -34,6 +34,7 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
         case "uploadFile":
             NSLog("self.arguments")
             let urlStr = self.arguments?["localPath"] as? String
+            let url = URL(fileURLWithPath: urlStr!)
             let appid = self.arguments?["appid"] as? String
             let region = self.arguments?["region"] as? String
             let cosPath = self.arguments?["cosPath"] as? String
@@ -60,18 +61,17 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
             config.endpoint = endpoint;
             
             // 使用 HTTPS
-            //          endpoint.useHTTPS = true;
-            
+            endpoint.useHTTPS = true;
+            print(QCloudCOSXMLService.hasService(forKey: region!))
             // 初始化 COS 服务示例
-            QCloudCOSXMLService.registerDefaultCOSXML(with: config);
-            QCloudCOSTransferMangerService.registerDefaultCOSTransferManger(
-                with: config);
+            if(!QCloudCOSXMLService.hasService(forKey: region!)){
+                    QCloudCOSXMLService.registerCOSXML(with: config, withKey: region!)
+            }
             let put:QCloudCOSXMLUploadObjectRequest = QCloudCOSXMLUploadObjectRequest<AnyObject>();
             
             put.object = cosPath!;
             put.bucket = bucket!;
-            put.body =  NSURL.fileURL(withPath: urlStr!) as AnyObject;
-            
+            put.body =  url as AnyObject;
             
             
             //监听上传进度
@@ -99,7 +99,7 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
                 
             };
             
-            put.setFinish { (result, error)in
+            put.setFinish { (resultT, error)in
                 //空字典创建
                 var data = [AnyHashable: Any]()
                 data.updateValue(urlStr!, forKey: "localPath")
@@ -108,10 +108,12 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
                     data.updateValue(error!, forKey: "message")
                     self.channel.invokeMethod("onFailed", arguments: data)
                 }else{
+                    result(cosPath)
                     self.channel.invokeMethod("onSuccess", arguments: data)
                 }
             }
-            
+            QCloudCOSTransferMangerService.registerDefaultCOSTransferManger(with: config)
+            QCloudCOSTransferMangerService.defaultCOSTransferManager().uploadObject(put);
             
             break;
             
@@ -122,10 +124,9 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
     
     public func signature(with fileds: QCloudSignatureFields!, request: QCloudBizHTTPRequest!, urlRequest urlRequst: NSMutableURLRequest!, compelete continueBlock: QCloudHTTPAuthentationContinueBlock!) {
         let credential = QCloudCredential.init();
-        credential.secretID = (self.arguments["secretId"] as! String);
-        credential.secretKey = (self.arguments["secretKey"] as! String);
-        credential.token = (self.arguments["sessionToken"] as! String);
-        
+//        credential.secretID = (self.arguments["secretId"] as! String);
+//        credential.secretKey = (self.arguments["secretKey"] as! String);
+//        credential.token = (self.arguments["sessionToken"] as! String);
         // 使用永久密钥计算签名
         let auth = QCloudAuthentationV5Creator.init(credential: credential);
         let signature = auth?.signature(forData: urlRequst)
