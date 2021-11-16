@@ -127,13 +127,13 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
         let credential = QCloudCredential.init();
         
         //暂时使用永久
-        credential.secretID = (self.arguments["secretId"] as! String);
-        credential.secretKey = (self.arguments["secretKey"] as! String);
-        
 //        credential.secretID = (self.arguments["secretId"] as! String);
 //        credential.secretKey = (self.arguments["secretKey"] as! String);
-//        credential.token = (self.arguments["sessionToken"] as! String);
-//
+        
+        credential.secretID = (self.arguments["secretId"] as! String);
+        credential.secretKey = (self.arguments["secretKey"] as! String);
+        credential.token = (self.arguments["sessionToken"] as! String);
+
 //        credential.startDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["startTime"] as! NSNumber)));
 //        credential.expirationDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["expiredTime"] as! NSNumber)))
 //
