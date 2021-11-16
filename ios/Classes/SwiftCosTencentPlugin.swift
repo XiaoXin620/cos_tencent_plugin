@@ -81,39 +81,40 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
                 //      totalBytesSent            已发送的字节数
                 //      totalBytesExpectedToSend  本次上传要发送的总字节数（即一个文件大小）
                 
-                //空字典创建
-                var data = [AnyHashable: Any]()
-                data.updateValue(urlStr!, forKey: "localPath")
-                data.updateValue(cosPath!, forKey: "cosPath")
-                
                 let a = NSNumber(value: totalBytesSent)
                 let b = NSNumber(value: totalBytesExpectedToSend)
                 let c = NSNumber(value: a.doubleValue / b.doubleValue * 100)
                 
-                data.updateValue(c, forKey: "progress")
+                let reslutMap: [String:Any] = [
+                    "localPath": urlStr!,
+                    "cosPath": cosPath!,
+                    "progress": c,
+                ]
                 
-                self.channel.invokeMethod("progress", arguments: data)
-                //                        int c = totalBytesSent/totalBytesExpectedToSend*100;
-                //
-                //                        data.updateValue(c, forKey: "progress")
+                self.channel.invokeMethod("progress", arguments: reslutMap)
                 
             };
             
             put.setFinish { (resultT, error)in
-                //空字典创建
-                var data = [AnyHashable: Any]()
-                data.updateValue(urlStr!, forKey: "localPath")
-                data.updateValue(cosPath!, forKey: "cosPath")
                 if error != nil{
-                    data.updateValue(error!, forKey: "message")
-                    self.channel.invokeMethod("onFailed", arguments: data)
+                    let reslutMap: [String:Any] = [
+                        "localPath": urlStr!,
+                        "cosPath": cosPath!,
+                        "message": error!.localizedDescription,
+                    ]
+                    result(reslutMap)
+                    self.channel.invokeMethod("onFailed", arguments: reslutMap)
                 }else{
-                    result(cosPath)
-                    self.channel.invokeMethod("onSuccess", arguments: data)
+                    let reslutMap: [String:Any] = [
+                        "localPath": urlStr!,
+                        "cosPath": cosPath!,
+                    ]
+                    result(reslutMap)
+                    self.channel.invokeMethod("onSuccess", arguments: reslutMap)
                 }
             }
-            QCloudCOSTransferMangerService.registerDefaultCOSTransferManger(with: config)
-            QCloudCOSTransferMangerService.defaultCOSTransferManager().uploadObject(put);
+            QCloudCOSTransferMangerService.registerCOSTransferManger(with: config, withKey: region!).uploadObject(put);
+//            QCloudCOSTransferMangerService.defaultCOSTransferManager().uploadObject(put);
             
             break;
             
@@ -124,14 +125,18 @@ public class SwiftCosTencentPlugin: NSObject, FlutterPlugin,QCloudSignatureProvi
     
     public func signature(with fileds: QCloudSignatureFields!, request: QCloudBizHTTPRequest!, urlRequest urlRequst: NSMutableURLRequest!, compelete continueBlock: QCloudHTTPAuthentationContinueBlock!) {
         let credential = QCloudCredential.init();
+        
+        //暂时使用永久
         credential.secretID = (self.arguments["secretId"] as! String);
         credential.secretKey = (self.arguments["secretKey"] as! String);
-        credential.token = (self.arguments["sessionToken"] as! String);
         
-        credential.startDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["startTime"] as! NSNumber)));
-        credential.expirationDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["expiredTime"] as! NSNumber)))
-        
-        // 使用永久密钥计算签名
+//        credential.secretID = (self.arguments["secretId"] as! String);
+//        credential.secretKey = (self.arguments["secretKey"] as! String);
+//        credential.token = (self.arguments["sessionToken"] as! String);
+//
+//        credential.startDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["startTime"] as! NSNumber)));
+//        credential.expirationDate = Date.init(timeIntervalSince1970: TimeInterval(truncating: (self.arguments["expiredTime"] as! NSNumber)))
+//
         let auth = QCloudAuthentationV5Creator.init(credential: credential);
         let signature = auth?.signature(forData: urlRequst)
         continueBlock(signature,nil);
